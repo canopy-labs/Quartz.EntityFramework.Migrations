@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL/CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL.Tests/CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL.Tests.csproj" />
+  </Folder>
+</Solution>

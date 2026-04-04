@@ -33,7 +33,7 @@ jobs:
         run: dotnet test --no-build --configuration Release --verbosity normal
 
       - name: Pack
-        run: dotnet pack src/Quartz.EntityFrameworkCore.Migrations.PostgreSQL/Quartz.EntityFrameworkCore.Migrations.PostgreSQL.csproj --no-build --configuration Release -p:PackageVersion=${{ steps.version.outputs.VERSION }} --output ./nupkg
+        run: dotnet pack src/CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL/CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL.csproj --no-build --configuration Release -p:PackageVersion=${{ steps.version.outputs.VERSION }} --output ./nupkg
 
       - name: NuGet login
         uses: NuGet/login@v1
