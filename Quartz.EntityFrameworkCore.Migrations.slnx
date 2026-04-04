@@ -1,8 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/Quartz.EntityFrameworkCore.Migrations.PostgreSQL/Quartz.EntityFrameworkCore.Migrations.PostgreSQL.csproj" />
-  </Folder>
-  <Folder Name="/test/">
-    <Project Path="test/Quartz.EntityFrameworkCore.Migrations.PostgreSQL.Tests/Quartz.EntityFrameworkCore.Migrations.PostgreSQL.Tests.csproj" />
-  </Folder>
-</Solution>
