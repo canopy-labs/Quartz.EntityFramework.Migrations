@@ -1,7 +1,7 @@
-# Quartz.EntityFrameworkCore.Migrations.PostgreSQL
+# CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL
 
 [![CI](https://github.com/canopy-labs/Quartz.EntityFramework.Migrations/actions/workflows/ci.yml/badge.svg)](https://github.com/canopy-labs/Quartz.EntityFramework.Migrations/actions/workflows/ci.yml)
-[![NuGet](https://img.shields.io/nuget/v/Quartz.EntityFrameworkCore.Migrations.PostgreSQL)](https://www.nuget.org/packages/Quartz.EntityFrameworkCore.Migrations.PostgreSQL)
+[![NuGet](https://img.shields.io/nuget/v/CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL)](https://www.nuget.org/packages/CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL)
 
 EF Core migration support for [Quartz.NET](https://www.quartz-scheduler.net/) PostgreSQL tables.
 
@@ -10,7 +10,7 @@ Instead of running raw SQL scripts to create Quartz.NET's database tables, this 
 ## Installation
 
 ```bash
-dotnet add package Quartz.EntityFrameworkCore.Migrations.PostgreSQL
+dotnet add package CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL
 ```
 
 ## Usage
