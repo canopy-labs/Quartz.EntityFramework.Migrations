@@ -26,6 +26,7 @@ internal class QuartzFiredTriggerConfiguration(string prefix, string? schema)
         builder.Property(x => x.JobGroup).HasColumnName("job_group").HasColumnType("text");
         builder.Property(x => x.IsNonconcurrent).HasColumnName("is_nonconcurrent").HasColumnType("bool").IsRequired();
         builder.Property(x => x.RequestsRecovery).HasColumnName("requests_recovery").HasColumnType("bool");
+        builder.Property(x => x.ExecutionGroup).HasColumnName("execution_group").HasColumnType("varchar(200)");
 
         builder.HasIndex(x => x.TriggerName).HasDatabaseName($"idx_{prefix}ft_trig_name");
         builder.HasIndex(x => x.TriggerGroup).HasDatabaseName($"idx_{prefix}ft_trig_group");

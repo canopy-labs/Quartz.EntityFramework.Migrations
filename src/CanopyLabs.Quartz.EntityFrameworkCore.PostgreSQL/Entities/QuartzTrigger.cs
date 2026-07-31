@@ -18,6 +18,9 @@ internal class QuartzTrigger
     public string? CalendarName { get; set; }
     public short? MisfireInstr { get; set; }
     public long? MisfireOrigFireTime { get; set; }
+    public string? ExecutionGroup { get; set; }
+    public string? PreferredNode { get; set; }
+    public bool PreferredNodeAuto { get; set; }
     public byte[]? JobData { get; set; }
 
     public QuartzJobDetail JobDetail { get; set; } = null!;

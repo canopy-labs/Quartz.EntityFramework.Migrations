@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <PackageId>CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL</PackageId>
-    <Version>3.17.0</Version>
+    <Version>3.19.0</Version>
     <Authors>Canopy Labs</Authors>
     <Description>EF Core migration support for Quartz.NET PostgreSQL tables</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
