@@ -57,9 +57,23 @@ modelBuilder.AddQuartzPostgreSql(prefix: "myapp_qrtz_", schema: "quartz");
 
 | Package Version | Quartz.NET Version | .NET |
 |---|---|---|
+| 3.19.x | 3.18.x, 3.19.x | 8, 9, 10 |
 | 3.17.x | 3.17.x | 8, 9, 10 |
 
 Match the major.minor version of this package to your Quartz.NET version.
+
+Each schema change is additive, so a newer package works with an older Quartz.NET —
+the reverse does not. 3.19.x adds three columns on top of 3.17.x:
+
+| Column | Table | Added in |
+|---|---|---|
+| `execution_group` | `qrtz_triggers`, `qrtz_fired_triggers` | Quartz.NET 3.18.0 |
+| `preferred_node` | `qrtz_triggers` | Quartz.NET 3.19.0 |
+| `preferred_node_auto` | `qrtz_triggers` | Quartz.NET 3.19.0 |
+
+Upgrading from the 3.17.x package generates a migration that adds these columns.
+All three are nullable or defaulted, so the migration is safe to apply to a live
+scheduler before rolling out the matching Quartz.NET upgrade.
 
 ## License
 

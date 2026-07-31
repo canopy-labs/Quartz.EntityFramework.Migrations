@@ -15,4 +15,5 @@ internal class QuartzFiredTrigger
     public string? JobGroup { get; set; }
     public bool IsNonconcurrent { get; set; }
     public bool? RequestsRecovery { get; set; }
+    public string? ExecutionGroup { get; set; }
 }
