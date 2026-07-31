@@ -77,6 +77,6 @@ scheduler before rolling out the matching Quartz.NET upgrade.
 
 ## License
 
-MIT - see [LICENSE](LICENSE) for details.
+MIT - see [LICENSE](https://github.com/canopy-labs/Quartz.EntityFramework.Migrations/blob/master/LICENSE) for details.
 
 Copyright (c) Canopy Labs
