@@ -57,13 +57,16 @@ modelBuilder.AddQuartzPostgreSql(prefix: "myapp_qrtz_", schema: "quartz");
 
 | Package Version | Quartz.NET Version | .NET |
 |---|---|---|
+| 3.20.x | 3.18.x, 3.19.x, 3.20.x | 8, 9, 10 |
 | 3.19.x | 3.18.x, 3.19.x | 8, 9, 10 |
 | 3.17.x | 3.17.x | 8, 9, 10 |
 
 Match the major.minor version of this package to your Quartz.NET version.
 
-Each schema change is additive, so a newer package works with an older Quartz.NET —
-the reverse does not. 3.19.x adds three columns on top of 3.17.x:
+A newer package works with an older Quartz.NET; the reverse does not. Every column
+added so far is nullable or defaulted, and Quartz.NET 3.18+ probes for the columns it
+needs rather than requiring them, so a column a given Quartz.NET version does not know
+about is simply unused. 3.19.x added three columns on top of 3.17.x:
 
 | Column | Table | Added in |
 |---|---|---|
@@ -74,6 +77,27 @@ the reverse does not. 3.19.x adds three columns on top of 3.17.x:
 Upgrading from the 3.17.x package generates a migration that adds these columns.
 All three are nullable or defaulted, so the migration is safe to apply to a live
 scheduler before rolling out the matching Quartz.NET upgrade.
+
+### 3.20.x realigns the indexes
+
+3.20.0 changes no table and no column. It tracks [Quartz.NET
+3.20.0's PostgreSQL index realignment](https://github.com/quartznet/quartznet/blob/v3.20.0/database/migrations/3.20/index_alignment_postgres.sql):
+every index now leads with `sched_name`, which every `AdoJobStore` statement filters on
+first, and `idx_qrtz_t_nft_st` gets its columns in acquire-query order
+(`sched_name, trigger_state, next_fire_time`) instead of the reversed
+`next_fire_time, trigger_state`. Eleven indexes become ten — seven single-column indexes
+that no statement could drive a scan from are replaced by five composites.
+
+Upgrading from the 3.19.x package generates a migration that drops the old indexes and
+creates the new ones. Two things worth knowing before applying it:
+
+- **It is performance-only.** Quartz.NET never names an index, so nothing breaks on any
+  version if you skip it, and a 3.20.x package is safe against a 3.18.x or 3.19.x
+  scheduler.
+- **On a busy database, hand-edit the generated migration** to use
+  `CREATE INDEX CONCURRENTLY` / `DROP INDEX CONCURRENTLY` and run those statements
+  outside a transaction. EF Core wraps a migration in one by default, and neither
+  concurrent form can run inside a transaction block.
 
 ## License
 

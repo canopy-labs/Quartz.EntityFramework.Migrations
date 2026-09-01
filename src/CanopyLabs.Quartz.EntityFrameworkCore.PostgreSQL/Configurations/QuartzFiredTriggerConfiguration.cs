@@ -28,12 +28,8 @@ internal class QuartzFiredTriggerConfiguration(string prefix, string? schema)
         builder.Property(x => x.RequestsRecovery).HasColumnName("requests_recovery").HasColumnType("bool");
         builder.Property(x => x.ExecutionGroup).HasColumnName("execution_group").HasColumnType("varchar(200)");
 
-        builder.HasIndex(x => x.TriggerName).HasDatabaseName($"idx_{prefix}ft_trig_name");
-        builder.HasIndex(x => x.TriggerGroup).HasDatabaseName($"idx_{prefix}ft_trig_group");
-        builder.HasIndex(x => new { x.SchedName, x.TriggerName, x.TriggerGroup }).HasDatabaseName($"idx_{prefix}ft_trig_nm_gp");
-        builder.HasIndex(x => x.InstanceName).HasDatabaseName($"idx_{prefix}ft_trig_inst_name");
-        builder.HasIndex(x => x.JobName).HasDatabaseName($"idx_{prefix}ft_job_name");
-        builder.HasIndex(x => x.JobGroup).HasDatabaseName($"idx_{prefix}ft_job_group");
-        builder.HasIndex(x => x.RequestsRecovery).HasDatabaseName($"idx_{prefix}ft_job_req_recovery");
+        builder.HasIndex(x => new { x.SchedName, x.InstanceName, x.RequestsRecovery }).HasDatabaseName($"idx_{prefix}ft_inst_job_req_rcvry");
+        builder.HasIndex(x => new { x.SchedName, x.JobName, x.JobGroup }).HasDatabaseName($"idx_{prefix}ft_j_g");
+        builder.HasIndex(x => new { x.SchedName, x.TriggerName, x.TriggerGroup }).HasDatabaseName($"idx_{prefix}ft_t_g");
     }
 }
