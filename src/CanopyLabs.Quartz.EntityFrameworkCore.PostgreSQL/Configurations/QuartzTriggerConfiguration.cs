@@ -38,8 +38,13 @@ internal class QuartzTriggerConfiguration(string prefix, string? schema)
             .WithMany()
             .HasForeignKey(x => new { x.SchedName, x.JobName, x.JobGroup });
 
-        builder.HasIndex(x => x.NextFireTime).HasDatabaseName($"idx_{prefix}t_next_fire_time");
-        builder.HasIndex(x => x.TriggerState).HasDatabaseName($"idx_{prefix}t_state");
-        builder.HasIndex(x => new { x.NextFireTime, x.TriggerState }).HasDatabaseName($"idx_{prefix}t_nft_st");
+        // Every AdoJobStore statement filters sched_name first, so every index leads with it.
+        // The acquire query is two equalities (sched_name, trigger_state) then a range on
+        // next_fire_time, which is why next_fire_time is last in idx_qrtz_t_nft_st.
+        builder.HasIndex(x => new { x.SchedName, x.JobName, x.JobGroup }).HasDatabaseName($"idx_{prefix}t_j");
+        builder.HasIndex(x => new { x.SchedName, x.CalendarName }).HasDatabaseName($"idx_{prefix}t_c");
+        builder.HasIndex(x => new { x.SchedName, x.TriggerGroup, x.TriggerName }).HasDatabaseName($"idx_{prefix}t_g_n");
+        builder.HasIndex(x => new { x.SchedName, x.NextFireTime }).HasDatabaseName($"idx_{prefix}t_next_fire_time");
+        builder.HasIndex(x => new { x.SchedName, x.TriggerState, x.NextFireTime }).HasDatabaseName($"idx_{prefix}t_nft_st");
     }
 }
