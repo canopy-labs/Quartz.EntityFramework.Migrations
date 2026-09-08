@@ -116,7 +116,13 @@ public class SchemaVerificationTest
             var tableName = match.Groups[2].Value.ToLowerInvariant();
             var columns = string.Join(", ", match.Groups[3].Value
                 .Split(',')
-                .Select(c => c.Trim().ToLowerInvariant()));
+                .Select(c => c.Trim().ToLowerInvariant())
+                // ASC is the SQL default, so Npgsql emits nothing for an ascending column while
+                // upstream's script spells it out (3.20 had no sort orders at all; 4.0's
+                // idx_qrtz_t_nft_st is the first mixed-order index). Normalising it away compares
+                // the two as the same index, which they are. DESC is deliberately NOT normalised:
+                // that is a real difference in the index and must still fail.
+                .Select(c => c.EndsWith(" asc", StringComparison.Ordinal) ? c[..^4].TrimEnd() : c));
             indexes.Add($"{indexName} ON {tableName}({columns})");
         }
 

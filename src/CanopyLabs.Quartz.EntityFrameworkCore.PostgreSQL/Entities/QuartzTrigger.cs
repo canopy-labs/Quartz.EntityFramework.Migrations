@@ -21,6 +21,8 @@ internal class QuartzTrigger
     public string? ExecutionGroup { get; set; }
     public string? PreferredNode { get; set; }
     public bool PreferredNodeAuto { get; set; }
+    public string? RetryPolicy { get; set; }
+    public int? RetryAttempt { get; set; }
     public byte[]? JobData { get; set; }
 
     public QuartzJobDetail JobDetail { get; set; } = null!;

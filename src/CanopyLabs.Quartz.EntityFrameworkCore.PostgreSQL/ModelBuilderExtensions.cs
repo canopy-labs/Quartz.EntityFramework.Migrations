@@ -18,6 +18,7 @@ public static class ModelBuilderExtensions
         modelBuilder.ApplyConfiguration(new QuartzBlobTriggerConfiguration(prefix, schema));
         modelBuilder.ApplyConfiguration(new QuartzCalendarConfiguration(prefix, schema));
         modelBuilder.ApplyConfiguration(new QuartzPausedTriggerGroupConfiguration(prefix, schema));
+        modelBuilder.ApplyConfiguration(new QuartzPausedJobGroupConfiguration(prefix, schema));
         modelBuilder.ApplyConfiguration(new QuartzFiredTriggerConfiguration(prefix, schema));
         modelBuilder.ApplyConfiguration(new QuartzSchedulerStateConfiguration(prefix, schema));
         modelBuilder.ApplyConfiguration(new QuartzLockConfiguration(prefix, schema));

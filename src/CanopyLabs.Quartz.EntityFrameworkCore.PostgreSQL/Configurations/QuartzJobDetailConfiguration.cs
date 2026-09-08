@@ -24,7 +24,6 @@ internal class QuartzJobDetailConfiguration(string prefix, string? schema)
         builder.Property(x => x.RequestsRecovery).HasColumnName("requests_recovery").HasColumnType("bool").IsRequired();
         builder.Property(x => x.JobData).HasColumnName("job_data").HasColumnType("bytea");
 
-        builder.HasIndex(x => new { x.SchedName, x.RequestsRecovery }).HasDatabaseName($"idx_{prefix}j_req_recovery");
         builder.HasIndex(x => new { x.SchedName, x.JobGroup, x.JobName }).HasDatabaseName($"idx_{prefix}j_g_n");
     }
 }
