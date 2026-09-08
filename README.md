@@ -57,6 +57,7 @@ modelBuilder.AddQuartzPostgreSql(prefix: "myapp_qrtz_", schema: "quartz");
 
 | Package Version | Quartz.NET Version | .NET |
 |---|---|---|
+| 4.0.x | 4.0.x | 8, 9, 10 |
 | 3.20.x | 3.18.x, 3.19.x, 3.20.x | 8, 9, 10 |
 | 3.19.x | 3.18.x, 3.19.x | 8, 9, 10 |
 | 3.17.x | 3.17.x | 8, 9, 10 |
@@ -66,7 +67,14 @@ Match the major.minor version of this package to your Quartz.NET version.
 A newer package works with an older Quartz.NET; the reverse does not. Every column
 added so far is nullable or defaulted, and Quartz.NET 3.18+ probes for the columns it
 needs rather than requiring them, so a column a given Quartz.NET version does not know
-about is simply unused. 3.19.x added three columns on top of 3.17.x:
+about is simply unused.
+
+**Quartz.NET 4.0 makes the reverse direction fail loudly.** It removed those probes,
+assumes `misfire_orig_fire_time`, `execution_group`, `preferred_node` and
+`preferred_node_auto` all exist, and validates its schema at startup. A 3.x-era package
+under a 4.x scheduler no longer degrades quietly — it stops the scheduler.
+
+3.19.x added three columns on top of 3.17.x:
 
 | Column | Table | Added in |
 |---|---|---|
@@ -94,6 +102,35 @@ creates the new ones. Two things worth knowing before applying it:
 - **It is performance-only.** Quartz.NET never names an index, so nothing breaks on any
   version if you skip it, and a 3.20.x package is safe against a 3.18.x or 3.19.x
   scheduler.
+- **On a busy database, hand-edit the generated migration** to use
+  `CREATE INDEX CONCURRENTLY` / `DROP INDEX CONCURRENTLY` and run those statements
+  outside a transaction. EF Core wraps a migration in one by default, and neither
+  concurrent form can run inside a transaction block.
+
+### 4.0.x tracks the Quartz.NET 4.0 schema
+
+4.0.0 is the first release to add a table. It tracks [Quartz.NET 4.0's mandatory
+migration](https://github.com/quartznet/quartznet/blob/v4.0.0/database/migrations/4.0/schema_30_to_40_upgrade_postgres.sql):
+
+| Change | Object | Why |
+|---|---|---|
+| `qrtz_paused_job_grps` (new table) | — | 3.x paused a job group without recording it, so a paused group could not be listed or survive a restart. 4.x keeps the group names here. |
+| `retry_policy varchar(250) null` | `qrtz_triggers` | The trigger's retry policy. |
+| `retry_attempt integer null` | `qrtz_triggers` | Retries already made for the occurrence being executed. |
+| `idx_qrtz_t_nft_st` reshaped | `qrtz_triggers` | Now `(sched_name, trigger_state, next_fire_time ASC, priority DESC, misfire_instr)` — the order acquisition reads in. |
+| `idx_qrtz_t_next_fire_time` dropped | `qrtz_triggers` | Redundant: the reshaped `idx_qrtz_t_nft_st` is a covering superset. |
+| `idx_qrtz_j_req_recovery` dropped | `qrtz_job_details` | No 4.x statement can drive a scan from it. |
+
+Both new columns are nullable with no default, so every existing row reads as "no retry
+policy" and no data migration is needed. Upgrading from the 3.20.x package generates a
+migration that adds the table and columns and reshapes the indexes.
+
+Two things worth knowing before applying it:
+
+- **The column half is safe during a rolling upgrade; the index half is not.** Upstream
+  ships these as two scripts for that reason. The generated EF migration combines them.
+  If you are rolling 3.x and 4.x nodes side by side, split the generated migration and
+  hold the index statements back until the last 3.x node is down.
 - **On a busy database, hand-edit the generated migration** to use
   `CREATE INDEX CONCURRENTLY` / `DROP INDEX CONCURRENTLY` and run those statements
   outside a transaction. EF Core wraps a migration in one by default, and neither

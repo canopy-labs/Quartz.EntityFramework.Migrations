@@ -32,6 +32,8 @@ internal class QuartzTriggerConfiguration(string prefix, string? schema)
         builder.Property(x => x.ExecutionGroup).HasColumnName("execution_group").HasColumnType("varchar(200)");
         builder.Property(x => x.PreferredNode).HasColumnName("preferred_node").HasColumnType("varchar(200)");
         builder.Property(x => x.PreferredNodeAuto).HasColumnName("preferred_node_auto").HasColumnType("bool").HasDefaultValue(false).IsRequired();
+        builder.Property(x => x.RetryPolicy).HasColumnName("retry_policy").HasColumnType("varchar(250)");
+        builder.Property(x => x.RetryAttempt).HasColumnName("retry_attempt").HasColumnType("integer");
         builder.Property(x => x.JobData).HasColumnName("job_data").HasColumnType("bytea");
 
         builder.HasOne(x => x.JobDetail)
@@ -39,12 +41,16 @@ internal class QuartzTriggerConfiguration(string prefix, string? schema)
             .HasForeignKey(x => new { x.SchedName, x.JobName, x.JobGroup });
 
         // Every AdoJobStore statement filters sched_name first, so every index leads with it.
-        // The acquire query is two equalities (sched_name, trigger_state) then a range on
-        // next_fire_time, which is why next_fire_time is last in idx_qrtz_t_nft_st.
+        // 4.0 widened idx_qrtz_t_nft_st to cover the acquire query end to end: two equalities
+        // (sched_name, trigger_state), the range on next_fire_time, then priority DESC and
+        // misfire_instr, which the query orders and filters by. That makes the standalone
+        // idx_qrtz_t_next_fire_time redundant (nft_st is a covering superset), so upstream
+        // dropped it along with idx_qrtz_j_req_recovery on qrtz_job_details.
         builder.HasIndex(x => new { x.SchedName, x.JobName, x.JobGroup }).HasDatabaseName($"idx_{prefix}t_j");
         builder.HasIndex(x => new { x.SchedName, x.CalendarName }).HasDatabaseName($"idx_{prefix}t_c");
         builder.HasIndex(x => new { x.SchedName, x.TriggerGroup, x.TriggerName }).HasDatabaseName($"idx_{prefix}t_g_n");
-        builder.HasIndex(x => new { x.SchedName, x.NextFireTime }).HasDatabaseName($"idx_{prefix}t_next_fire_time");
-        builder.HasIndex(x => new { x.SchedName, x.TriggerState, x.NextFireTime }).HasDatabaseName($"idx_{prefix}t_nft_st");
+        builder.HasIndex(x => new { x.SchedName, x.TriggerState, x.NextFireTime, x.Priority, x.MisfireInstr })
+            .IsDescending(false, false, false, true, false)
+            .HasDatabaseName($"idx_{prefix}t_nft_st");
     }
 }
