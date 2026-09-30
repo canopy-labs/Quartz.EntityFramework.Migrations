@@ -15,4 +15,5 @@ internal class QuartzExecutionHistory
     public string? ErrorMessage { get; set; }
     public int RetryAttempt { get; set; }
     public bool RetryScheduled { get; set; }
+    public string? ExecutionLog { get; set; }
 }

@@ -15,5 +15,8 @@ internal class QuartzPausedJobGroupConfiguration(string prefix, string? schema)
 
         builder.Property(x => x.SchedName).HasColumnName("sched_name").HasColumnType("text").IsRequired();
         builder.Property(x => x.JobGroup).HasColumnName("job_group").HasColumnType("text").IsRequired();
+        builder.Property(x => x.PauseReason).HasColumnName("pause_reason").HasColumnType("varchar(250)");
+        builder.Property(x => x.PausedBy).HasColumnName("paused_by").HasColumnType("varchar(200)");
+        builder.Property(x => x.PausedAt).HasColumnName("paused_at").HasColumnType("bigint");
     }
 }

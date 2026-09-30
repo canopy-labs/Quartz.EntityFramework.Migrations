@@ -11,4 +11,5 @@ internal class QuartzMisfireHistory
     public string? JobGroup { get; set; }
     public long MisfireTime { get; set; }
     public long? SchedTime { get; set; }
+    public int? Reason { get; set; }
 }

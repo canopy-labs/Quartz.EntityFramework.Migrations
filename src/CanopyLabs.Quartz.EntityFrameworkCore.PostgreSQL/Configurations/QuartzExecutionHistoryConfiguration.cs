@@ -31,6 +31,7 @@ internal class QuartzExecutionHistoryConfiguration(string prefix, string? schema
         builder.Property(x => x.ErrorMessage).HasColumnName("error_message").HasColumnType("text");
         builder.Property(x => x.RetryAttempt).HasColumnName("retry_attempt").HasColumnType("integer").HasDefaultValue(0).IsRequired();
         builder.Property(x => x.RetryScheduled).HasColumnName("retry_scheduled").HasColumnType("bool").HasDefaultValue(false).IsRequired();
+        builder.Property(x => x.ExecutionLog).HasColumnName("execution_log").HasColumnType("text");
 
         // (sched_name, fired_time) serves the age query and the retention sweep;
         // (sched_name, instance_name) serves the node filter.
