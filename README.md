@@ -57,7 +57,8 @@ modelBuilder.AddQuartzPostgreSql(prefix: "myapp_qrtz_", schema: "quartz");
 
 | Package Version | Quartz.NET Version | .NET |
 |---|---|---|
-| 4.0.x | 4.0.x | 8, 9, 10 |
+| 4.2.x | 4.0.x, 4.1.x, 4.2.x | 8, 9, 10 |
+| 4.0.x | 4.0.x, 4.1.x | 8, 9, 10 |
 | 3.20.x | 3.18.x, 3.19.x, 3.20.x | 8, 9, 10 |
 | 3.19.x | 3.18.x, 3.19.x | 8, 9, 10 |
 | 3.17.x | 3.17.x | 8, 9, 10 |
@@ -135,6 +136,33 @@ Two things worth knowing before applying it:
   `CREATE INDEX CONCURRENTLY` / `DROP INDEX CONCURRENTLY` and run those statements
   outside a transaction. EF Core wraps a migration in one by default, and neither
   concurrent form can run inside a transaction block.
+
+### 4.2.x tracks the Quartz.NET 4.2 schema
+
+Quartz.NET 4.1 changed no table, so there is no 4.1.x package: 4.0.x covers 4.1.x.
+4.2.0 adds three columns and two tables, taken from upstream's two
+[4.2 migrations](https://github.com/quartznet/quartznet/tree/v4.2.0/database/migrations/4.2):
+
+| Change | Object | Required by Quartz.NET 4.2? |
+|---|---|---|
+| `continues_trigger_name text null` | `qrtz_triggers` | **Yes.** Names the trigger a continuation waits on. |
+| `continues_trigger_group text null` | `qrtz_triggers` | **Yes.** Its group. |
+| `continuation_condition integer null` | `qrtz_triggers` | **Yes.** The `ContinuationCondition` flags that release the wait. |
+| `qrtz_execution_history` (new table) + 2 indexes | — | No. Read and written only when `UseExecutionHistory()` is configured. |
+| `qrtz_misfire_history` (new table) + 2 indexes | — | No. Same condition. |
+
+**A 4.2 scheduler refuses to start without the three continuation columns.** It
+validates its schema at startup, so a 4.0.x package under Quartz.NET 4.2 stops the
+scheduler with `column "continues_trigger_name" does not exist`.
+
+Upgrading from the 4.0.x package generates a migration that adds the columns, the two
+tables and their indexes. It is safe to apply before rolling out Quartz.NET 4.2:
+
+- The three columns are nullable with no default, so existing rows need no data
+  migration, and 4.0/4.1 nodes never read them. Migrate, roll every node to 4.2, and
+  only then schedule continuations, since a 4.0 or 4.1 node cannot settle one.
+- The history tables have no foreign keys and nothing else references them, so they are
+  inert until a 4.2 node turns the history on.
 
 ## License
 

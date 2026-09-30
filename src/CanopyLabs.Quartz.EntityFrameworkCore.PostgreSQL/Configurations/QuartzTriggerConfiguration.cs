@@ -34,6 +34,12 @@ internal class QuartzTriggerConfiguration(string prefix, string? schema)
         builder.Property(x => x.PreferredNodeAuto).HasColumnName("preferred_node_auto").HasColumnType("bool").HasDefaultValue(false).IsRequired();
         builder.Property(x => x.RetryPolicy).HasColumnName("retry_policy").HasColumnType("varchar(250)");
         builder.Property(x => x.RetryAttempt).HasColumnName("retry_attempt").HasColumnType("integer");
+        // 4.2 continuations: the trigger this one waits on (a trigger key, so declared like
+        // trigger_name/trigger_group but nullable) and the ContinuationCondition flags that
+        // release it. Upstream adds no index for them; the settlement lookup rides nft_st.
+        builder.Property(x => x.ContinuesTriggerName).HasColumnName("continues_trigger_name").HasColumnType("text");
+        builder.Property(x => x.ContinuesTriggerGroup).HasColumnName("continues_trigger_group").HasColumnType("text");
+        builder.Property(x => x.ContinuationCondition).HasColumnName("continuation_condition").HasColumnType("integer");
         builder.Property(x => x.JobData).HasColumnName("job_data").HasColumnType("bytea");
 
         builder.HasOne(x => x.JobDetail)
