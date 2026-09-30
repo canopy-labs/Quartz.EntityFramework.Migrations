@@ -23,6 +23,9 @@ internal class QuartzTrigger
     public bool PreferredNodeAuto { get; set; }
     public string? RetryPolicy { get; set; }
     public int? RetryAttempt { get; set; }
+    public string? ContinuesTriggerName { get; set; }
+    public string? ContinuesTriggerGroup { get; set; }
+    public int? ContinuationCondition { get; set; }
     public byte[]? JobData { get; set; }
 
     public QuartzJobDetail JobDetail { get; set; } = null!;

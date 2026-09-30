@@ -1,0 +1,18 @@
+namespace CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL.Entities;
+
+internal class QuartzExecutionHistory
+{
+    public string SchedName { get; set; } = null!;
+    public string EntryId { get; set; } = null!;
+    public string InstanceName { get; set; } = null!;
+    public string JobName { get; set; } = null!;
+    public string JobGroup { get; set; } = null!;
+    public string TriggerName { get; set; } = null!;
+    public string TriggerGroup { get; set; } = null!;
+    public long FiredTime { get; set; }
+    public long RunTime { get; set; }
+    public bool Succeeded { get; set; }
+    public string? ErrorMessage { get; set; }
+    public int RetryAttempt { get; set; }
+    public bool RetryScheduled { get; set; }
+}
