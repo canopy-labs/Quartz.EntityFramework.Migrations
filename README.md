@@ -57,6 +57,7 @@ modelBuilder.AddQuartzPostgreSql(prefix: "myapp_qrtz_", schema: "quartz");
 
 | Package Version | Quartz.NET Version | .NET |
 |---|---|---|
+| 4.3.x | 4.0.x, 4.1.x, 4.2.x, 4.3.x | 8, 9, 10 |
 | 4.2.x | 4.0.x, 4.1.x, 4.2.x | 8, 9, 10 |
 | 4.0.x | 4.0.x, 4.1.x | 8, 9, 10 |
 | 3.20.x | 3.18.x, 3.19.x, 3.20.x | 8, 9, 10 |
@@ -163,6 +164,26 @@ tables and their indexes. It is safe to apply before rolling out Quartz.NET 4.2:
   only then schedule continuations, since a 4.0 or 4.1 node cannot settle one.
 - The history tables have no foreign keys and nothing else references them, so they are
   inert until a 4.2 node turns the history on.
+
+### 4.3.x tracks the Quartz.NET 4.3 schema
+
+4.3.0 adds columns only: no table and no index changes. It follows upstream's five
+[4.3 migrations](https://github.com/quartznet/quartznet/tree/v4.3.0/database/migrations/4.3):
+
+| Change | Object | Required by Quartz.NET 4.3? |
+|---|---|---|
+| `overlap_policy integer null` | `qrtz_triggers` | **Yes.** What to do when a firing lands while the previous one is still running. |
+| `pause_reason varchar(250) null`, `paused_by varchar(200) null`, `paused_at bigint null` | `qrtz_triggers`, `qrtz_paused_trigger_grps`, `qrtz_paused_job_grps` | **Yes.** Who paused the trigger or group, when, and why. |
+| `progress integer null`, `progress_message varchar(250) null` | `qrtz_fired_triggers` | **Yes.** What a running job last reported about its progress. |
+| `execution_log text null` | `qrtz_execution_history` | No. Only used with `UseExecutionHistory()`. |
+| `reason integer null` | `qrtz_misfire_history` | No. Same condition. |
+
+**A 4.3 scheduler refuses to start without the required columns**, so a 4.2.x package
+under Quartz.NET 4.3 stops the scheduler.
+
+Upgrading from the 4.2.x package generates a migration that only adds nullable columns
+with no default. Existing rows need no data migration, and 4.0 to 4.2 nodes never read
+the new columns, so it is safe to apply before rolling out Quartz.NET 4.3.
 
 ## License
 

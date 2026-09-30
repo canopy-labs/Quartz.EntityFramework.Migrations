@@ -26,6 +26,7 @@ internal class QuartzMisfireHistoryConfiguration(string prefix, string? schema)
         builder.Property(x => x.JobGroup).HasColumnName("job_group").HasColumnType("text");
         builder.Property(x => x.MisfireTime).HasColumnName("misfire_time").HasColumnType("bigint").IsRequired();
         builder.Property(x => x.SchedTime).HasColumnName("sched_time").HasColumnType("bigint");
+        builder.Property(x => x.Reason).HasColumnName("reason").HasColumnType("integer");
 
         builder.HasIndex(x => new { x.SchedName, x.MisfireTime }).HasDatabaseName($"idx_{prefix}mh_misfire_time");
         builder.HasIndex(x => new { x.SchedName, x.InstanceName }).HasDatabaseName($"idx_{prefix}mh_inst");

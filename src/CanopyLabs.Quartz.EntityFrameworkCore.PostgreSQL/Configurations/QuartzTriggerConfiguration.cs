@@ -40,6 +40,12 @@ internal class QuartzTriggerConfiguration(string prefix, string? schema)
         builder.Property(x => x.ContinuesTriggerName).HasColumnName("continues_trigger_name").HasColumnType("text");
         builder.Property(x => x.ContinuesTriggerGroup).HasColumnName("continues_trigger_group").HasColumnType("text");
         builder.Property(x => x.ContinuationCondition).HasColumnName("continuation_condition").HasColumnType("integer");
+        // 4.3: what to do when a firing lands while the previous one still runs, and who paused
+        // the trigger, when and why. All nullable, no default; no index added.
+        builder.Property(x => x.OverlapPolicy).HasColumnName("overlap_policy").HasColumnType("integer");
+        builder.Property(x => x.PauseReason).HasColumnName("pause_reason").HasColumnType("varchar(250)");
+        builder.Property(x => x.PausedBy).HasColumnName("paused_by").HasColumnType("varchar(200)");
+        builder.Property(x => x.PausedAt).HasColumnName("paused_at").HasColumnType("bigint");
         builder.Property(x => x.JobData).HasColumnName("job_data").HasColumnType("bytea");
 
         builder.HasOne(x => x.JobDetail)

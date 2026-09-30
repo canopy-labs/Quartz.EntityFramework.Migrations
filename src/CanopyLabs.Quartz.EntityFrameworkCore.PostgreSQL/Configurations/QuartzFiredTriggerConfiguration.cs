@@ -27,6 +27,9 @@ internal class QuartzFiredTriggerConfiguration(string prefix, string? schema)
         builder.Property(x => x.IsNonconcurrent).HasColumnName("is_nonconcurrent").HasColumnType("bool").IsRequired();
         builder.Property(x => x.RequestsRecovery).HasColumnName("requests_recovery").HasColumnType("bool");
         builder.Property(x => x.ExecutionGroup).HasColumnName("execution_group").HasColumnType("varchar(200)");
+        // 4.3: what a running job last reported about its own progress.
+        builder.Property(x => x.Progress).HasColumnName("progress").HasColumnType("integer");
+        builder.Property(x => x.ProgressMessage).HasColumnName("progress_message").HasColumnType("varchar(250)");
 
         builder.HasIndex(x => new { x.SchedName, x.InstanceName, x.RequestsRecovery }).HasDatabaseName($"idx_{prefix}ft_inst_job_req_rcvry");
         builder.HasIndex(x => new { x.SchedName, x.JobName, x.JobGroup }).HasDatabaseName($"idx_{prefix}ft_j_g");

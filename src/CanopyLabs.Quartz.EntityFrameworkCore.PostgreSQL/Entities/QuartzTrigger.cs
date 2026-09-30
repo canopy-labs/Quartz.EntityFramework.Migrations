@@ -26,6 +26,10 @@ internal class QuartzTrigger
     public string? ContinuesTriggerName { get; set; }
     public string? ContinuesTriggerGroup { get; set; }
     public int? ContinuationCondition { get; set; }
+    public int? OverlapPolicy { get; set; }
+    public string? PauseReason { get; set; }
+    public string? PausedBy { get; set; }
+    public long? PausedAt { get; set; }
     public byte[]? JobData { get; set; }
 
     public QuartzJobDetail JobDetail { get; set; } = null!;
