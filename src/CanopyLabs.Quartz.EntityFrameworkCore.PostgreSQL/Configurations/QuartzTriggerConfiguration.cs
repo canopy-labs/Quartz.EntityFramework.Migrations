@@ -46,6 +46,9 @@ internal class QuartzTriggerConfiguration(string prefix, string? schema)
         builder.Property(x => x.PauseReason).HasColumnName("pause_reason").HasColumnType("varchar(250)");
         builder.Property(x => x.PausedBy).HasColumnName("paused_by").HasColumnType("varchar(200)");
         builder.Property(x => x.PausedAt).HasColumnName("paused_at").HasColumnType("bigint");
+        // 4.6: the trigger's own misfire threshold in milliseconds; NULL means the store's
+        // MisfireThreshold. No index added: it is read as a residual beside nft_st.
+        builder.Property(x => x.MisfireThreshold).HasColumnName("misfire_threshold").HasColumnType("bigint");
         builder.Property(x => x.JobData).HasColumnName("job_data").HasColumnType("bytea");
 
         builder.HasOne(x => x.JobDetail)

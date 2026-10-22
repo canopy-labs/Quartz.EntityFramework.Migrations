@@ -57,7 +57,8 @@ modelBuilder.AddQuartzPostgreSql(prefix: "myapp_qrtz_", schema: "quartz");
 
 | Package Version | Quartz.NET Version | .NET |
 |---|---|---|
-| 4.3.x | 4.0.x, 4.1.x, 4.2.x, 4.3.x | 8, 9, 10 |
+| 4.6.x | 4.0.x – 4.6.x | 8, 9, 10 |
+| 4.3.x | 4.0.x – 4.5.x | 8, 9, 10 |
 | 4.2.x | 4.0.x, 4.1.x, 4.2.x | 8, 9, 10 |
 | 4.0.x | 4.0.x, 4.1.x | 8, 9, 10 |
 | 3.20.x | 3.18.x, 3.19.x, 3.20.x | 8, 9, 10 |
@@ -184,6 +185,37 @@ under Quartz.NET 4.3 stops the scheduler.
 Upgrading from the 4.2.x package generates a migration that only adds nullable columns
 with no default. Existing rows need no data migration, and 4.0 to 4.2 nodes never read
 the new columns, so it is safe to apply before rolling out Quartz.NET 4.3.
+
+### 4.6.x tracks the Quartz.NET 4.6 schema
+
+Quartz.NET 4.4 and 4.5 changed only the optional history tables, so the 4.3.x package
+covers them and there is no 4.4.x or 4.5.x package. 4.6.0 picks those changes up
+together with 4.6's own, from upstream's
+[4.4](https://github.com/quartznet/quartznet/tree/v4.6.0/database/migrations/4.4) and
+[4.6](https://github.com/quartznet/quartznet/tree/v4.6.0/database/migrations/4.6) migrations:
+
+| Change | Object | Required by Quartz.NET 4.6? |
+|---|---|---|
+| `misfire_threshold bigint null` | `qrtz_triggers` | **Yes.** The trigger's own misfire threshold in milliseconds; NULL is the store's `MisfireThreshold`. |
+| `interrupt_requested_time bigint null` | `qrtz_fired_triggers` | **Yes.** When another node asked to interrupt the firing. |
+| `quartz_version varchar(20) null` | `qrtz_scheduler_state` | **Yes.** The version each node runs, written at check-in. |
+| `result`, `summary`, `metrics`, `manual`, `fire_instance_id`, `job_input`, `job_input_too_large` (all nullable) | `qrtz_execution_history` | No (4.4). Only used with `UseExecutionHistory()`. |
+| `qrtz_job_status` (new table) | — | No (4.4). Same condition. |
+| `idx_qrtz_eh_job_time` (4.4), `idx_qrtz_eh_fire_inst`, `idx_qrtz_eh_trig_time` (4.6) | `qrtz_execution_history` | No. Same condition. |
+
+**A 4.6 scheduler refuses to start without the three required columns**, so a 4.3.x
+package under Quartz.NET 4.6 stops the scheduler with `column "quartz_version" does not
+exist`.
+
+Upgrading from the 4.3.x package generates a migration that adds nullable columns, one
+table and three indexes. It is safe to apply before rolling out Quartz.NET 4.6:
+
+- The required columns are nullable with no default, and a 4.5 node never names them.
+  A 4.6 node reads a NULL `quartz_version` as "older than 4.6" and keeps taking the
+  cluster's `TRIGGER_ACCESS` lock until every live node reports 4.6, so a mixed cluster
+  needs no configuration. Roll every node before giving a trigger its own misfire
+  threshold or relying on a cross-node interrupt.
+- The history table, columns and indexes are inert until a node turns the history on.
 
 ## License
 

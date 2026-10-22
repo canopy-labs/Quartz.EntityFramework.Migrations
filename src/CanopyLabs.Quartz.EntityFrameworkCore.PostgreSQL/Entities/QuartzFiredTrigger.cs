@@ -18,4 +18,5 @@ internal class QuartzFiredTrigger
     public string? ExecutionGroup { get; set; }
     public int? Progress { get; set; }
     public string? ProgressMessage { get; set; }
+    public long? InterruptRequestedTime { get; set; }
 }
