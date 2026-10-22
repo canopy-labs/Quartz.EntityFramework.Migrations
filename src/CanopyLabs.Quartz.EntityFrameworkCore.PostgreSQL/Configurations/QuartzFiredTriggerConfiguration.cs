@@ -30,6 +30,10 @@ internal class QuartzFiredTriggerConfiguration(string prefix, string? schema)
         // 4.3: what a running job last reported about its own progress.
         builder.Property(x => x.Progress).HasColumnName("progress").HasColumnType("integer");
         builder.Property(x => x.ProgressMessage).HasColumnName("progress_message").HasColumnType("varchar(250)");
+        // 4.6: when another node asked to interrupt this firing, in ticks like fired_time.
+        // The running node reads its own rows by (sched_name, instance_name), which
+        // idx_qrtz_ft_inst_job_req_rcvry already leads with, so no index is added.
+        builder.Property(x => x.InterruptRequestedTime).HasColumnName("interrupt_requested_time").HasColumnType("bigint");
 
         builder.HasIndex(x => new { x.SchedName, x.InstanceName, x.RequestsRecovery }).HasDatabaseName($"idx_{prefix}ft_inst_job_req_rcvry");
         builder.HasIndex(x => new { x.SchedName, x.JobName, x.JobGroup }).HasDatabaseName($"idx_{prefix}ft_j_g");

@@ -6,4 +6,5 @@ internal class QuartzSchedulerState
     public string InstanceName { get; set; } = null!;
     public long LastCheckinTime { get; set; }
     public long CheckinInterval { get; set; }
+    public string? QuartzVersion { get; set; }
 }

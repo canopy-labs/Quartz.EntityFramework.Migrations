@@ -24,6 +24,7 @@ public static class ModelBuilderExtensions
         modelBuilder.ApplyConfiguration(new QuartzLockConfiguration(prefix, schema));
         modelBuilder.ApplyConfiguration(new QuartzExecutionHistoryConfiguration(prefix, schema));
         modelBuilder.ApplyConfiguration(new QuartzMisfireHistoryConfiguration(prefix, schema));
+        modelBuilder.ApplyConfiguration(new QuartzJobStatusConfiguration(prefix, schema));
 
         return modelBuilder;
     }

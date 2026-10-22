@@ -30,6 +30,7 @@ internal class QuartzTrigger
     public string? PauseReason { get; set; }
     public string? PausedBy { get; set; }
     public long? PausedAt { get; set; }
+    public long? MisfireThreshold { get; set; }
     public byte[]? JobData { get; set; }
 
     public QuartzJobDetail JobDetail { get; set; } = null!;
