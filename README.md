@@ -57,6 +57,7 @@ modelBuilder.AddQuartzPostgreSql(prefix: "myapp_qrtz_", schema: "quartz");
 
 | Package Version | Quartz.NET Version | .NET |
 |---|---|---|
+| 4.7.x | 4.0.x – 4.7.x | 8, 9, 10, 11 |
 | 4.6.x | 4.0.x – 4.6.x | 8, 9, 10 |
 | 4.3.x | 4.0.x – 4.5.x | 8, 9, 10 |
 | 4.2.x | 4.0.x, 4.1.x, 4.2.x | 8, 9, 10 |
@@ -216,6 +217,27 @@ table and three indexes. It is safe to apply before rolling out Quartz.NET 4.6:
   needs no configuration. Roll every node before giving a trigger its own misfire
   threshold or relying on a cross-node interrupt.
 - The history table, columns and indexes are inert until a node turns the history on.
+
+### 4.7.x tracks the Quartz.NET 4.7 schema
+
+Quartz.NET 4.7 adds one column, from upstream's
+[4.7](https://github.com/quartznet/quartznet/tree/v4.7.0/database/migrations/4.7) migration:
+
+| Change | Object | Required by Quartz.NET 4.7? |
+|---|---|---|
+| `fixed_delay bool null` | `qrtz_triggers` | **Yes.** True when a simple trigger measures its interval from the previous run's completion; NULL is a fixed rate. |
+
+**A 4.7 scheduler refuses to start without it**, so a 4.6.x package under Quartz.NET 4.7
+stops the scheduler with `column "fixed_delay" does not exist`.
+
+Upgrading from the 4.6.x package generates a migration that adds one nullable column with
+no default. It is safe to apply before rolling out Quartz.NET 4.7: every existing row reads
+as a fixed rate, and a 4.6 node never names the column. Roll every node before making a
+trigger measure from completion, since a 4.6 node fires such a trigger at a fixed rate.
+
+4.7.0 also adds a `net11.0` target. Npgsql's EF Core 11 provider had not reached 11.0.0
+when it shipped, so that target depends on `Npgsql.EntityFrameworkCore.PostgreSQL`
+`11.0.0-rc.3` as a minimum: reference 11.0.0 or later yourself and NuGet uses it.
 
 ## License
 

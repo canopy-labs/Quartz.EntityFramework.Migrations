@@ -17,7 +17,12 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '10.0.x'
+          # SDK 11 builds every target; the others bring the runtimes the test step runs on.
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+            11.0.x
 
       - name: Extract version from tag
         id: version

@@ -10,16 +10,33 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        dotnet-version: ['8.0.x', '9.0.x', '10.0.x']
+        # One leg per shipped target framework. Each runs SchemaVerificationTest against
+        # that target's EF Core major, so every TFM's generated DDL is checked upstream.
+        # Building a net11.0 target needs SDK 11, so every leg installs it next to the
+        # SDK that brings its own runtime.
+        include:
+          - framework: net8.0
+            dotnet-version: '8.0.x'
+          - framework: net9.0
+            dotnet-version: '9.0.x'
+          - framework: net10.0
+            dotnet-version: '10.0.x'
+          - framework: net11.0
+            dotnet-version: '11.0.x'
 
+    # Named by dotnet-version: the master ruleset requires build-and-test (8.0.x/9.0.x/10.0.x).
+    name: build-and-test (${{ matrix.dotnet-version }})
     steps:
       - uses: actions/checkout@v7
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: |
+            ${{ matrix.dotnet-version }}
+            11.0.x
 
       - name: Restore
         run: dotnet restore
@@ -28,4 +45,4 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity normal
+        run: dotnet test --no-build --configuration Release --framework ${{ matrix.framework }} --verbosity normal

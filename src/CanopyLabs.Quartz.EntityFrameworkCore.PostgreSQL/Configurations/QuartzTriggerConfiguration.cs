@@ -49,6 +49,9 @@ internal class QuartzTriggerConfiguration(string prefix, string? schema)
         // 4.6: the trigger's own misfire threshold in milliseconds; NULL means the store's
         // MisfireThreshold. No index added: it is read as a residual beside nft_st.
         builder.Property(x => x.MisfireThreshold).HasColumnName("misfire_threshold").HasColumnType("bigint");
+        // 4.7: true when a simple trigger measures its interval from the previous run's
+        // completion; NULL is a fixed rate. No index added: read as a residual beside nft_st.
+        builder.Property(x => x.FixedDelay).HasColumnName("fixed_delay").HasColumnType("bool");
         builder.Property(x => x.JobData).HasColumnName("job_data").HasColumnType("bytea");
 
         builder.HasOne(x => x.JobDetail)
