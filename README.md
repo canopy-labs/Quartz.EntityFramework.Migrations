@@ -57,7 +57,7 @@ modelBuilder.AddQuartzPostgreSql(prefix: "myapp_qrtz_", schema: "quartz");
 
 | Package Version | Quartz.NET Version | .NET |
 |---|---|---|
-| 4.7.x | 4.0.x – 4.7.x | 8, 9, 10 |
+| 4.7.x | 4.0.x – 4.7.x | 8, 9, 10, 11 |
 | 4.6.x | 4.0.x – 4.6.x | 8, 9, 10 |
 | 4.3.x | 4.0.x – 4.5.x | 8, 9, 10 |
 | 4.2.x | 4.0.x, 4.1.x, 4.2.x | 8, 9, 10 |
@@ -234,6 +234,10 @@ Upgrading from the 4.6.x package generates a migration that adds one nullable co
 no default. It is safe to apply before rolling out Quartz.NET 4.7: every existing row reads
 as a fixed rate, and a 4.6 node never names the column. Roll every node before making a
 trigger measure from completion, since a 4.6 node fires such a trigger at a fixed rate.
+
+4.7.0 also adds a `net11.0` target. Npgsql's EF Core 11 provider had not reached 11.0.0
+when it shipped, so that target depends on `Npgsql.EntityFrameworkCore.PostgreSQL`
+`11.0.0-rc.3` as a minimum: reference 11.0.0 or later yourself and NuGet uses it.
 
 ## License
 

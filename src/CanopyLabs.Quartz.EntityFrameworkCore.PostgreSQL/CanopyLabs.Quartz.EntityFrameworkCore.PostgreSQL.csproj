@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
     <PackageId>CanopyLabs.Quartz.EntityFrameworkCore.PostgreSQL</PackageId>
     <Version>4.7.0</Version>
     <Authors>Canopy Labs</Authors>
@@ -12,6 +12,7 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/canopy-labs/Quartz.EntityFramework.Migrations</RepositoryUrl>
     <PackageProjectUrl>https://github.com/canopy-labs/Quartz.EntityFramework.Migrations</PackageProjectUrl>
+    <NoWarn>$(NoWarn);NU5104</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +29,13 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.*" />
+  </ItemGroup>
+
+  <!-- Npgsql's EF Core 11 provider is still a release candidate. NuGet reads this as a
+       minimum, so consumers move to 11.0.0 once it ships. NU5104 (stable package with a
+       prerelease dependency) is suppressed for that reason; drop both once 11.0.0 is out. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0-rc.3" />
   </ItemGroup>
 
   <ItemGroup>
